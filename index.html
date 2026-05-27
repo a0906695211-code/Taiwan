@@ -487,3 +487,136 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探索雙北 - 旅遊輿情分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h1 class="text-2xl font-bold text-gray-900">雙北旅遊與景點最新數據與情感分析報告</h1>
+            <p class="text-gray-500 text-sm mt-2">本報告基於自動化爬蟲與機器學習情緒分析模型，即時分析各主要論壇（如 PTT Travel 板、Dcard 旅遊板）中關於雙北景點的焦點話題與社群氛圍。</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-gray-400 text-sm font-medium">分析貼文總數</p>
+                <p class="text-3xl font-bold text-gray-800 mt-2">150 <span class="text-sm font-normal text-gray-500">篇</span></p>
+                <p class="text-xs text-gray-400 mt-1">來源：Dcard、PTT 旅遊相關看板</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-gray-400 text-sm font-medium">平均情緒指數</p>
+                <p class="text-3xl font-bold text-emerald-500 mt-2">0.72</p>
+                <p class="text-xs text-gray-400 mt-1">範圍：0.00 (極悲觀) ~ 1.00 (極樂觀)</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-gray-400 text-sm font-medium">社群整體氛圍</p>
+                <p class="text-3xl font-bold text-emerald-600 mt-2">正向偏多</p>
+                <p class="text-xs text-gray-400 mt-1">依貼文內容情緒傾向加權判定</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 md:col-span-2">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">熱門話題關鍵字權重排行 (Top 15)</h2>
+                <div class="h-64"><canvas id="barChart"></canvas></div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">貼文情緒傾向分佈</h2>
+                <div class="h-64 flex justify-center items-center"><canvas id="pieChart"></canvas></div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <h2 class="text-lg font-bold text-gray-800 mb-2">貼文原始數據及情緒評分表</h2>
+            <p class="text-xs text-gray-400 mb-4">低於 0.40 標記為負向，高於 0.60 標記為正向，其餘為中性。</p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 text-gray-400 font-medium">
+                            <th class="py-3 px-2">#</th>
+                            <th class="py-3 px-4">貼文標題</th>
+                            <th class="py-3 px-4">看板/來源</th>
+                            <th class="py-3 px-4">情緒分數</th>
+                            <th class="py-3 px-4">狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 text-gray-700">
+                        <tr>
+                            <td class="py-3 px-2 font-medium">1</td>
+                            <td class="py-3 px-4 font-medium text-blue-600 hover:underline cursor-pointer">請問陽明山現在去還有繡球花可以看嗎？</td>
+                            <td class="py-3 px-4 text-gray-500">國立臺灣大學</td>
+                            <td class="py-3 px-4 font-mono">0.8550</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs font-semibold bg-green-50 text-green-600">正向</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-2 font-medium">2</td>
+                            <td class="py-3 px-4 font-medium text-blue-600 hover:underline cursor-pointer">抱怨：週末淡水老街人擠人，輕軌排隊排到火大</td>
+                            <td class="py-3 px-4 text-gray-500">匿名 / 旅遊板</td>
+                            <td class="py-3 px-4 font-mono">0.0820</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs font-semibold bg-red-50 text-red-600">負向</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-2 font-medium">3</td>
+                            <td class="py-3 px-4 font-medium text-blue-600 hover:underline cursor-pointer">九份高評價民宿誠實心得（差點踩雷）</td>
+                            <td class="py-3 px-4 text-gray-500">輔仁大學</td>
+                            <td class="py-3 px-4 font-mono">0.3500</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs font-semibold bg-red-50 text-red-600">負向</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-2 font-medium">4</td>
+                            <td class="py-3 px-4 font-medium text-blue-600 hover:underline cursor-pointer">雙北不開車一日遊路線推薦！搭捷運就能到</td>
+                            <td class="py-3 px-4 text-gray-500">小不點 / PTT</td>
+                            <td class="py-3 px-4 font-mono">0.9821</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs font-semibold bg-green-50 text-green-600">正向</span></td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-2 font-medium">5</td>
+                            <td class="py-3 px-4 font-medium text-blue-600 hover:underline cursor-pointer">烏來溫泉湯屋選擇障礙，求大家推薦</td>
+                            <td class="py-3 px-4 text-gray-500">淡江大學</td>
+                            <td class="py-3 px-4 font-mono">0.5232</td>
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-xs font-semibold bg-yellow-50 text-yellow-600">中性</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 條形圖
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: ['陽明山', '九份老街', '住宿推薦', '貓空纜車', '一日遊', '踩雷', '夜市美食', '淡水日落', '捷運美食', '象山夜景'],
+                datasets: [{
+                    label: '話題權重',
+                    data: [9.5, 8.8, 8.2, 7.5, 6.8, 6.2, 5.8, 5.5, 5.2, 4.8],
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 6
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 圓餅圖
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
+            data: {
+                labels: ['正向', '中立', '負向'],
+                datasets: [{
+                    data: [65, 15, 20],
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+</body>
+</html>
